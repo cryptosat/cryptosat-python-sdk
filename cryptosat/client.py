@@ -1,18 +1,24 @@
-import api
+from .api.client import Client
+from .api.sat_metrics import get_timestamp
 from .ballot import Ballot
 from .delay_enc_keypair import DelayEncKeypair
 from .sign_message import SignMessage
+from importlib.metadata import version
 
-import requests
+VERSION = version('cryptosat-python-sdk')
 
 
 class CryptosatClient:
+
     def __init__(self, base_url: str):
-        self.api_client = api.Client(base_url)
+        self.api_client = Client(base_url)
 
     def version(self):
-        path = "/version"
-        return self.request("GET", path)
+        response = get_timestamp(self.api_client)
+        return {
+            "version": VERSION,
+            "timestamp": response.timestamp
+        }
 
     def create_keypair(self, delay):
         return DelayEncKeypair(self, delay)

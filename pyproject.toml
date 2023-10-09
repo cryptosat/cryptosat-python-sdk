@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Python SDK for Cryptosat confidential computing services"
 authors = ["Cryptosat Inc. <dev@crytposat.io>"]
 readme = "README.md"
+packages = [
+    { include = "cryptosat" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"

@@ -14,7 +14,7 @@ class PublicKeysResponse(BaseModel):
 
 
 class TimestampResponse(BaseModel):
-    timestamp: float
+    timestamp: int
     signature: str
 
 
