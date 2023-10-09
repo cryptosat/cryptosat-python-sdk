@@ -1,5 +1,3 @@
-
-
 class DelayEncKeypair:
     def __init__(self, client, delay):
         self.client = client

@@ -1,4 +1,3 @@
-
 class Ballot:
     def __init__(self, client, min_participants):
         self.client = client

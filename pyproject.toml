@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "cryptosat-python-sdk"
+version = "0.1.0"
+description = "Python SDK for Cryptosat confidential computing services"
+authors = ["Cryptosat Inc. <dev@crytposat.io>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.31.0"
+pydantic = "^2.4.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target_version = ['py38', 'py39', 'py310', 'py311']
+exclude = '''
+(
+  /(
+    | \.git
+    | \.venv
+    | \.mypy_cache
+  )/
+)
+'''
+
+[tool.isort]
+line_length = 120
+profile = "black"
+

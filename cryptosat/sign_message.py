@@ -1,4 +1,3 @@
-
 class SignMessage:
     def __init__(self, client, payload):
         self.client = client
@@ -8,7 +7,7 @@ class SignMessage:
         # TODO: Add input validation
         payload = {"message": message}
         path = "/sign-message"
-        #return payload
+        # return payload
         response = self.client.request("POST", path, json=payload)
         return response["request_uuid"]  # Store request_uuid
 

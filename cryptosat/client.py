@@ -1,18 +1,18 @@
+import api
 from .ballot import Ballot
 from .delay_enc_keypair import DelayEncKeypair
 from .sign_message import SignMessage
 
 import requests
 
-class Client:
-    def __init__(self, base_url):
-        self.base_url = base_url
 
-    def request(self, method, path, **kwargs):
-        url = self.base_url + path
-        response = requests.request(method, url, **kwargs)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        return response.json()  # Parse JSON response
+class CryptosatClient:
+    def __init__(self, base_url: str):
+        self.api_client = api.Client(base_url)
+
+    def version(self):
+        path = "/version"
+        return self.request("GET", path)
 
     def create_keypair(self, delay):
         return DelayEncKeypair(self, delay)
@@ -49,4 +49,3 @@ class Client:
         if format is not None:
             params["format"] = format
         return self.request("GET", path, params=params)
-
