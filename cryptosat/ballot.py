@@ -1,7 +1,8 @@
 import base64
 from typing import Optional
 
-import rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 
 from cryptosat.api.client import Client
 from cryptosat.api.private_ballot import (
@@ -15,9 +16,16 @@ from cryptosat.errors import ResourceNotFoundError, InvalidResourceStateError
 
 
 def encrypt_message(pubkey_pem: str, msg: str) -> str:
-    pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey_pem.encode())
-    encrypted_msg = rsa.encrypt(msg.encode(), pubkey)
-    return base64.encodebytes(encrypted_msg).decode()
+    pubkey = serialization.load_pem_public_key(pubkey_pem.encode())
+    ciphertext = pubkey.encrypt(
+        msg.encode(),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return base64.b64encode(ciphertext).decode('utf-8')
 
 
 class Ballot:
