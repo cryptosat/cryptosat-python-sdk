@@ -1,16 +1,22 @@
-class SignMessage:
-    def __init__(self, client, payload):
+from cryptosat.api.client import Client
+from cryptosat.api.message_signing import get_sign_message_status
+from cryptosat.request import RequestStatus
+
+
+class SignMessageRequest:
+    def __init__(self, client: Client, request_uuid: str):
+        self.result = None
         self.client = client
-        self.request_uuid = self.create(payload)
+        self.request_uuid = request_uuid
 
-    def create(self, message):
-        # TODO: Add input validation
-        payload = {"message": message}
-        path = "/sign-message"
-        # return payload
-        response = self.client.request("POST", path, json=payload)
-        return response["request_uuid"]  # Store request_uuid
+    def get_status(self) -> RequestStatus:
+        if self.result:
+            return RequestStatus.READY
 
-    def get_status(self):
-        path = f"/sign-message/status/{self.request_uuid}"
-        return self.client.request("GET", path)
+        response = get_sign_message_status(self.client, self.request_uuid)
+
+        if response:
+            self.result = response
+            return RequestStatus.READY
+
+        return RequestStatus.SENT

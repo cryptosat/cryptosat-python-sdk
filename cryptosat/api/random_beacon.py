@@ -28,7 +28,7 @@ class RandomnessResponse(BaseModel):
 
 def get_randomness(
     client: Client,
-    num: Optional[str] = None,
+    num: Optional[int] = None,
     type_: Optional[GetRandomnessType] = GetRandomnessType.FLOAT,
     format_: Optional[GetRandomnessFormat] = GetRandomnessFormat.DEC,
 ) -> RandomnessResponse:
