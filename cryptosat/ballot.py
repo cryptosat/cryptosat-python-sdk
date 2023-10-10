@@ -1,27 +1,68 @@
+import base64
+from typing import Optional
+
+import rsa
+
+from cryptosat.api.client import Client
+from cryptosat.api.private_ballot import get_ballot, post_ballot_vote, VoteBody, post_ballot_finalize, get_ballot_result
+from cryptosat.errors import ResourceNotFoundError, InvalidResourceStateError
+
+
+def encrypt_message(pubkey_pem: str, msg: str) -> str:
+    pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey_pem.encode())
+    encrypted_msg = rsa.encrypt(msg.encode(), pubkey)
+    return base64.encodebytes(encrypted_msg).decode()
+
+
 class Ballot:
-    def __init__(self, client, min_participants):
+    def __init__(self, client: Client, ballot_id: str):
         self.client = client
-        self.ballot_id = self.create(min_participants)
+        self.ballot_id = ballot_id
+        self.public_key = None
+        self.finalized = False
+        self.result = None
 
-    def create(self, min_participants):
-        # TODO: Add input validation
-        path = f"/ballot/{min_participants}"
-        response = self.client.request("POST", path)
-        return response["ballot_id"]  # Store ballot_id
+    def try_fetch_public_key(self) -> Optional[str]:
+        if self.public_key:
+            return self.public_key
 
-    def finalize(self):
-        path = f"/ballots/{self.ballot_id}/finalize"
-        return self.client.request("POST", path)
+        response = get_ballot(self.client, self.ballot_id)
+        if response:
+            self.public_key = response.public_key
 
-    def get(self):
-        path = f"/ballots/{self.ballot_id}"
-        return self.client.request("GET", path)
+        return self.public_key
 
-    def get_result(self):
-        path = f"/ballots/{self.ballot_id}/result"
-        return self.client.request("GET", path)
+    def vote(self, vote: str) -> None:
+        public_key = self.try_fetch_public_key()
+        if not public_key:
+            raise ResourceNotFoundError(f"Ballot with ID {self.ballot_id} not ready")
 
-    def vote(self, vote_payload):
-        # TODO: Add input validation
-        path = f"/ballots/{self.ballot_id}/vote"
-        return self.client.request("POST", path, json=vote_payload)
+        encrypted_vote = encrypt_message(self.public_key, vote)
+        vote_body = VoteBody(encrypted_vote=encrypted_vote)
+
+        post_ballot_vote(self.client, self.ballot_id, vote_body)
+
+    def finalize(self) -> None:
+        public_key = self.try_fetch_public_key()
+        if not public_key:
+            raise ResourceNotFoundError(f"Ballot with ID {self.ballot_id} not ready")
+
+        if self.finalized:
+            raise InvalidResourceStateError(f"The ballot with ID {self.ballot_id} is finalized")
+
+        post_ballot_finalize(self.client, self.ballot_id)
+        self.finalized = True
+
+    def try_fetch_result(self) -> Optional[str]:
+        if not self.finalized:
+            raise InvalidResourceStateError(f"The resource has not been finalized yet")
+
+        if self.result:
+            return self.result
+
+        response = get_ballot_result(self.client, self.ballot_id)
+        if response:
+            self.result = response.ballot_result
+
+        print(self.result)
+        return self.result

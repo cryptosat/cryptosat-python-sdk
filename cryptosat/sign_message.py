@@ -1,6 +1,7 @@
+from typing import Optional
+
 from cryptosat.api.client import Client
-from cryptosat.api.message_signing import get_sign_message_status
-from cryptosat.request import RequestStatus
+from cryptosat.api.message_signing import get_sign_message_status, StatusResponse
 
 
 class SignMessageRequest:
@@ -9,14 +10,11 @@ class SignMessageRequest:
         self.client = client
         self.request_uuid = request_uuid
 
-    def get_status(self) -> RequestStatus:
+    def try_fetch_result(self) -> Optional[StatusResponse]:
         if self.result:
-            return RequestStatus.READY
+            return self.result
 
         response = get_sign_message_status(self.client, self.request_uuid)
+        self.result = response
 
-        if response:
-            self.result = response
-            return RequestStatus.READY
-
-        return RequestStatus.SENT
+        return self.result

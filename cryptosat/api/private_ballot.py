@@ -57,9 +57,9 @@ def post_ballot_finalize(client: Client, ballot_id: str):
     return None
 
 
-def get_ballot_result(client: Client, ballot_id: int) -> Optional[GetResultResponse]:
+def get_ballot_result(client: Client, ballot_id: str) -> Optional[GetResultResponse]:
     path = f"/ballots/{ballot_id}/result"
-    response = client.request("POST", path)
+    response = client.request("GET", path)
     response.raise_for_status()
 
     if response.status_code == HTTPStatus.OK:

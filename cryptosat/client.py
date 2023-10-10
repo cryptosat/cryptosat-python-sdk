@@ -3,7 +3,9 @@ from typing import Optional
 from pydantic import BaseModel
 
 from .api.client import Client
+from .api.delay_encryption import post_delay_enc_keypair
 from .api.message_signing import post_sign_message, SignMessageBody
+from .api.private_ballot import post_ballot
 from .api.random_beacon import (
     get_randomness,
     GetRandomnessType,
@@ -67,19 +69,21 @@ class CryptosatClient:
         return response.next_online_s
 
     def get_randomness(
-        self,
-        num: Optional[int] = None,
-        rtype: Optional[GetRandomnessType] = GetRandomnessType.FLOAT,
-        rformat: Optional[GetRandomnessFormat] = GetRandomnessFormat.DEC,
+            self,
+            num: Optional[int] = None,
+            rtype: Optional[GetRandomnessType] = GetRandomnessType.FLOAT,
+            rformat: Optional[GetRandomnessFormat] = GetRandomnessFormat.DEC,
     ) -> RandomnessResponse:
         return get_randomness(self.api_client, num, rtype, rformat)
 
-    def sign_message(self, message: str):
+    def sign_message(self, message: str) -> SignMessageRequest:
         response = post_sign_message(self.api_client, body=SignMessageBody(message=message))
         return SignMessageRequest(self.api_client, response.request_uuid)
 
-    # def create_keypair(self, delay):
-    #     return DelayEncKeypair(self, delay)
-    #
-    # def create_ballot(self, min_participants):
-    #     return Ballot(self, min_participants)
+    def create_ballot(self, min_participants: int) -> Ballot:
+        response = post_ballot(self.api_client, min_participants)
+        return Ballot(self.api_client, response.ballot_id)
+
+    def create_keypair(self, delay: str) -> DelayEncKeypair:
+        response = post_delay_enc_keypair(self.api_client, delay)
+        return DelayEncKeypair(self.api_client, response.keypair_id)
