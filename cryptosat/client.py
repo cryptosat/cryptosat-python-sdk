@@ -69,10 +69,10 @@ class CryptosatClient:
         return response.next_online_s
 
     def get_randomness(
-            self,
-            num: Optional[int] = None,
-            rtype: Optional[GetRandomnessType] = GetRandomnessType.FLOAT,
-            rformat: Optional[GetRandomnessFormat] = GetRandomnessFormat.DEC,
+        self,
+        num: Optional[int] = None,
+        rtype: Optional[GetRandomnessType] = GetRandomnessType.FLOAT,
+        rformat: Optional[GetRandomnessFormat] = GetRandomnessFormat.DEC,
     ) -> RandomnessResponse:
         return get_randomness(self.api_client, num, rtype, rformat)
 

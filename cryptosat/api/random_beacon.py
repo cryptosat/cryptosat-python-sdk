@@ -4,6 +4,7 @@ from typing import List, Optional, Union
 from pydantic import BaseModel
 
 from .client import Client
+from ..errors import validate_model
 
 
 class GetRandomnessType(str, Enum):
@@ -40,5 +41,4 @@ def get_randomness(
     params = {k: v for k, v in params.items() if v is not None}
 
     response = client.request("GET", "/randomness", params=params)
-    response.raise_for_status()
-    return RandomnessResponse.model_validate(response.json())
+    return validate_model(RandomnessResponse, response.json())

@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 from .client import Client
+from ..errors import validate_model
 
 
 class NextOnlineResponse(BaseModel):
@@ -31,29 +32,24 @@ class VRFPublicResponse(BaseModel):
 
 def get_next_online(client: Client) -> NextOnlineResponse:
     response = client.request("GET", "/next-online")
-    response.raise_for_status()
-    return NextOnlineResponse.model_validate(response.json())
+    return validate_model(NextOnlineResponse, response.json())
 
 
 def get_public_keys(client: Client) -> PublicKeysResponse:
     response = client.request("GET", "/public-keys")
-    response.raise_for_status()
-    return PublicKeysResponse.model_validate(response.json())
+    return validate_model(PublicKeysResponse, response.json())
 
 
 def get_timestamp(client: Client) -> TimestampResponse:
     response = client.request("GET", "/timestamp")
-    response.raise_for_status()
-    return TimestampResponse.model_validate(response.json())
+    return validate_model(TimestampResponse, response.json())
 
 
 def get_public_random(client: Client) -> PublicRandomResponse:
     response = client.request("GET", "/public-random")
-    response.raise_for_status()
-    return PublicRandomResponse.model_validate(response.json())
+    return validate_model(PublicRandomResponse, response.json())
 
 
 def get_vrf_public(client: Client) -> VRFPublicResponse:
     response = client.request("GET", "/vrf-public")
-    response.raise_for_status()
-    return VRFPublicResponse.model_validate(response.json())
+    return validate_model(VRFPublicResponse, response.json())

@@ -1,7 +1,10 @@
 from typing import Optional
 
 from cryptosat.api.client import Client
-from cryptosat.api.delay_encryption import get_delay_enc_keypair_public, get_delay_enc_keypair_private
+from cryptosat.api.delay_encryption import (
+    get_delay_enc_keypair_public,
+    get_delay_enc_keypair_private,
+)
 from cryptosat.errors import ResourceNotFoundError
 
 
@@ -25,7 +28,9 @@ class DelayEncKeypair:
     def try_fetch_private_key(self) -> Optional[str]:
         public_key = self.try_fetch_public_key()
         if not public_key:
-            raise ResourceNotFoundError(f"The keypair with ID: {self.keypair_id} has not been created yet")
+            raise ResourceNotFoundError(
+                f"The keypair with ID: {self.keypair_id} has not been created yet"
+            )
 
         response = get_delay_enc_keypair_private(self.client, self.keypair_id)
         if response:

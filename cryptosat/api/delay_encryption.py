@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from .client import Client
+from ..errors import validate_model
 
 
 class KeypairResponse(BaseModel):
@@ -21,17 +22,15 @@ class PrivateKeyResponse(BaseModel):
 def post_delay_enc_keypair(client: Client, delay: str) -> KeypairResponse:
     path = f"/delay-enc-keypair/{delay}"
     response = client.request("POST", path)
-    response.raise_for_status()
-    return KeypairResponse.model_validate(response.json())
+    return validate_model(KeypairResponse, response.json())
 
 
 def get_delay_enc_keypair_public(client: Client, keypair_id: str) -> Optional[PublicKeyResponse]:
     path = f"/delay-enc-keypairs/{keypair_id}/public"
     response = client.request("GET", path)
-    response.raise_for_status()
 
     if response.status_code == HTTPStatus.OK:
-        return PublicKeyResponse.model_validate(response.json())
+        return validate_model(PublicKeyResponse, response.json())
 
     return None
 
@@ -39,9 +38,8 @@ def get_delay_enc_keypair_public(client: Client, keypair_id: str) -> Optional[Pu
 def get_delay_enc_keypair_private(client: Client, keypair_id: str) -> Optional[PrivateKeyResponse]:
     path = f"/delay-enc-keypairs/{keypair_id}/private"
     response = client.request("GET", path)
-    response.raise_for_status()
 
     if response.status_code == HTTPStatus.OK:
-        return PrivateKeyResponse.model_validate(response.json())
+        return validate_model(PrivateKeyResponse, response.json())
 
     return None

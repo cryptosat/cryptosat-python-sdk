@@ -4,7 +4,13 @@ from typing import Optional
 import rsa
 
 from cryptosat.api.client import Client
-from cryptosat.api.private_ballot import get_ballot, post_ballot_vote, VoteBody, post_ballot_finalize, get_ballot_result
+from cryptosat.api.private_ballot import (
+    get_ballot,
+    post_ballot_vote,
+    VoteBody,
+    post_ballot_finalize,
+    get_ballot_result,
+)
 from cryptosat.errors import ResourceNotFoundError, InvalidResourceStateError
 
 

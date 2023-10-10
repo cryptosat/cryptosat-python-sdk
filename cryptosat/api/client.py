@@ -1,14 +1,6 @@
-from http import HTTPStatus
-from typing import MutableMapping, Optional, Generic, T, Any
-
 import requests
 
-
-class Response(Generic[T]):
-    status_code: HTTPStatus
-    content: bytes
-    headers: MutableMapping[str, str]
-    parsed: Optional[T]
+from cryptosat.errors import APICommunicationError
 
 
 class Client:
@@ -19,4 +11,11 @@ class Client:
 
     def request(self, method, path, **kwargs):
         url = self.base_url + path
-        return requests.request(method, url, **kwargs)
+        response = requests.request(method, url, **kwargs)
+
+        try:
+            response.raise_for_status()
+        except requests.RequestException as e:
+            raise APICommunicationError(f"API request failed with error: {str(e)}") from e
+
+        return response
