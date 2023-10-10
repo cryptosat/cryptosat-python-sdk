@@ -8,8 +8,13 @@ Cryptosat SDK provides a seamless way to integrate with Cryptosat services direc
 
 ## Local installation
 
+    poetry build 
+    pip install dist/cryptosat_python_sdk-0.1.0-py3-none-any.whl
+
+## Virtual environment
+
     poetry install
-    poetray shell
+    poetry shell
 
 ## Quick Start
 
