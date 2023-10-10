@@ -64,5 +64,4 @@ class Ballot:
         if response:
             self.result = response.ballot_result
 
-        print(self.result)
         return self.result

@@ -79,5 +79,21 @@ while result is None:
 ### Delay Encryption
 
 ```python
+# Initiate the keypair
+keypair = cryptosat.create_keypair(delay="60s")
 
+# Poll the public key of the keypair creation until it is ready
+public_key = keypair.try_fetch_public_key()
+while public_key is None:
+    time.sleep(5)
+    public_key = keypair.try_fetch_public_key()
+
+# Wait until private key is released
+time.sleep(60)
+    
+# Poll the private key  until it is ready
+private_key = keypair.try_fetch_private_key()
+while private_key is None:
+    time.sleep(5)
+    private_key = keypair.try_fetch_private_key()
 ```

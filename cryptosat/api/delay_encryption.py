@@ -14,6 +14,10 @@ class PublicKeyResponse(BaseModel):
     public_key: str
 
 
+class PrivateKeyResponse(BaseModel):
+    private_key: str
+
+
 def post_delay_enc_keypair(client: Client, delay: str) -> KeypairResponse:
     path = f"/delay-enc-keypair/{delay}"
     response = client.request("POST", path)
@@ -23,10 +27,21 @@ def post_delay_enc_keypair(client: Client, delay: str) -> KeypairResponse:
 
 def get_delay_enc_keypair_public(client: Client, keypair_id: str) -> Optional[PublicKeyResponse]:
     path = f"/delay-enc-keypairs/{keypair_id}/public"
-    response = client.request("POST", path)
+    response = client.request("GET", path)
     response.raise_for_status()
 
     if response.status_code == HTTPStatus.OK:
         return PublicKeyResponse.model_validate(response.json())
+
+    return None
+
+
+def get_delay_enc_keypair_private(client: Client, keypair_id: str) -> Optional[PrivateKeyResponse]:
+    path = f"/delay-enc-keypairs/{keypair_id}/private"
+    response = client.request("GET", path)
+    response.raise_for_status()
+
+    if response.status_code == HTTPStatus.OK:
+        return PrivateKeyResponse.model_validate(response.json())
 
     return None
