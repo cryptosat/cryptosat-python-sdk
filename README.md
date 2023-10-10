@@ -24,11 +24,49 @@ cryptosat = CryptosatClient('https://sandbox.api.cryptosat.io/v0')
 version = cryptosat.version()
 ```
 
-### Timestamp
+## Usage
+
+### Satellite metrics
 
 ```python
 # Fetch the satellite timestamp
 result = cryptosat.get_timestamp()
+
+# Fetch the version
+version = cryptosat.version()
+
+# Fetch the satellite signing key
+public_key = cryptosat.get_public_signing_key()
+
+# If the cryptosat is offline you can query for the next time it will be online
+next_online = cryptosat.get_next_online()
+```
+
+### Validate Signature
+
+```python
+from cryptosat.client import CryptosatClient
+from cryptosat.binary import pem2bytes, int2bytes
+import nacl.signing
+import nacl.encoding
+
+cryptosat = CryptosatClient('https://sandbox.api.cryptosat.io/v0')
+
+result = cryptosat.get_timestamp()
+
+# Convert timestamp and its signature to bytes
+timestamp_bytes = int2bytes(result.timestamp)
+signature_bytes = bytes.fromhex(result.signature)
+
+# Fetch the public signing key from the Cryptosat
+signing_key = cryptosat.get_public_signing_key()
+
+# Convert signing key to bytes
+signing_key_bytes = pem2bytes(signing_key)
+
+# Verify signature
+verify_key = nacl.signing.VerifyKey(signing_key_bytes)
+verify_key.verify(timestamp_bytes, signature_bytes)
 ```
 
 ### Public randomness
