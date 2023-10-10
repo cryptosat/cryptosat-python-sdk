@@ -18,7 +18,11 @@ class APICommunicationError(SDKError):
 
 
 class UnexpectedAPIResponseError(SDKError):
-    """Raised when the API response is not as expected."""
+    """Raised when the API response is not as expected"""
+
+
+class ValidationError(SDKError):
+    """Raised when there are issues with the input."""
 
 
 def validate_model(model, data):

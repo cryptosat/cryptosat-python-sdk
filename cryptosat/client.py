@@ -1,6 +1,7 @@
+import re
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from .api.client import Client
 from .api.delay_encryption import post_delay_enc_keypair
@@ -81,9 +82,18 @@ class CryptosatClient:
         return SignMessageRequest(self.api_client, response.request_uuid)
 
     def create_ballot(self, min_participants: int) -> Ballot:
+        if min_participants < 1:
+            raise ValidationError(
+                f"Invalid number of participants, has to be integer greater than 0"
+            )
         response = post_ballot(self.api_client, min_participants)
         return Ballot(self.api_client, response.ballot_id)
 
     def create_keypair(self, delay: str) -> DelayEncKeypair:
+        match = re.fullmatch(r"(\d+)([smhd])?", delay)
+        if not match:
+            raise ValidationError(
+                "Delay parameter is not in the expected format. Example: 1, 600s, 10m, 24h, 1d"
+            )
         response = post_delay_enc_keypair(self.api_client, delay)
         return DelayEncKeypair(self.api_client, response.keypair_id)
